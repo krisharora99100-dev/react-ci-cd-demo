@@ -1,9 +1,12 @@
-name: CI/CD Pipeline
+name: React CI/CD Pipeline
 
 on:
   push:
     branches:
-      - main
+      - main   # triggers workflow on pushes to main
+
+permissions:
+  contents: write  # fixes git push (exit code 128)
 
 jobs:
   build:
@@ -13,22 +16,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '18'  # or 20 if you use newer Node
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci   # faster, cleaner install than npm install
 
       - name: Run tests
-        run: npm test
+        run: npm test -- --watchAll=false
 
-      - name: Build project
+      - name: Build React app
         run: npm run build
 
+      # Optional: Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
-        if: success()
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
